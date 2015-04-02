@@ -1,17 +1,16 @@
 package com.jamieyang.a2048;
 
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.FontMetricsInt;
-import android.view.View;
 
-public class CellView extends View {
-	static int CELL_WIDTH = 50;
-	static int CELL_HEIGHT = 50;
+public class Cell {
+	static int CELL_WIDTH = 90;
+	static int CELL_HEIGHT = 90;
 
-	Paint paint = new Paint();
+	Paint paint;
+	Canvas canvas;
 
 	float x = 0;
 	float y = 0;
@@ -20,18 +19,23 @@ public class CellView extends View {
 	String color_value;
 	int textSize = 32;
 	
-	public CellView(Context context) {
-		super(context);
-		// TODO Auto-generated constructor stub
+	public Cell() {
+		
 	}
 
-	public void onDraw(Canvas canvas) {
+	public void draw(Canvas canvas, Paint paint) {
+		this.canvas = canvas;
+		this.paint = paint;
+		
 		this.setAtrribute();
-		this.drawBackground(canvas);
-		this.drawValue(canvas);
+		this.drawBackground();
+		this.drawValue();
 	}
 
 	private void setAtrribute() {
+		int[] data_num_color = { -10395295, -10395295, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+		int[] data_numbg_color = { -4133, -6214, -29591, -36266, -40121, -47872, -1123198, -1128192, -1135346, -1140224, -23217, -4985286, -4985286 };
+		
 		switch (this.value) {
 		case 0:
 			color_bg = "#CCC0B3";
@@ -88,12 +92,12 @@ public class CellView extends View {
 		}
 	}
 
-	private void drawBackground(Canvas canvas) {
+	private void drawBackground() {
 		paint.setColor(Color.parseColor(this.color_bg));
 		canvas.drawRoundRect(x, y, x + CELL_WIDTH, y + CELL_HEIGHT, 5, 5, paint);
 	}
 
-	private void drawValue(Canvas canvas) {
+	private void drawValue() {
 		paint.setColor(Color.parseColor(this.color_value));
 		paint.setTextSize(this.textSize);
 		FontMetricsInt fontMetrics = paint.getFontMetricsInt();  
