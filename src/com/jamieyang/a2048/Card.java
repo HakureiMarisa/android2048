@@ -1,37 +1,34 @@
 package com.jamieyang.a2048;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.FontMetricsInt;
+import android.view.View;
 
-public class Cell {
-	static int CELL_WIDTH = 90;
-	static int CELL_HEIGHT = 90;
+public class Card extends View{
+	public Card(Context context) {
+		super(context);
+	}
 
-	Paint paint;
+	float width, height;
+
+	Paint paint = new Paint();
 	Canvas canvas;
 
-	float x = 0;
-	float y = 0;
 	int value = 0;
 	String color_bg;
 	String color_value;
 	int textSize = 32;
-	
-	public Cell() {
-		
-	}
 
-	public void draw(Canvas canvas, Paint paint) {
+	public void onDraw(Canvas canvas) {
 		this.canvas = canvas;
-		this.paint = paint;
-		
 		this.setAtrribute();
 		this.drawBackground();
 		this.drawValue();
 	}
-
+	
 	private void setAtrribute() {
 		int[] data_num_color = { -10395295, -10395295, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 		int[] data_numbg_color = { -4133, -6214, -29591, -36266, -40121, -47872, -1123198, -1128192, -1135346, -1140224, -23217, -4985286, -4985286 };
@@ -94,7 +91,7 @@ public class Cell {
 
 	private void drawBackground() {
 		paint.setColor(Color.parseColor(this.color_bg));
-		canvas.drawRoundRect(x, y, x + CELL_WIDTH, y + CELL_HEIGHT, 5, 5, paint);
+		canvas.drawRoundRect(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 5, 5, paint);
 	}
 
 	private void drawValue() {
@@ -102,9 +99,9 @@ public class Cell {
 		paint.setTextSize(this.textSize);
 		FontMetricsInt fontMetrics = paint.getFontMetricsInt();  
         // 转载请注明出处：http://blog.csdn.net/hursing  
-	    float baseline = y + (CELL_HEIGHT - (fontMetrics.bottom - fontMetrics.top)) / 2 - fontMetrics.top;  
+	    float baseline = this.getY() + (this.height - (fontMetrics.bottom - fontMetrics.top)) / 2 - fontMetrics.top;  
 	    // 下面这行是实现水平居中，drawText对应改为传入targetRect.centerX()  
 	    paint.setTextAlign(Paint.Align.CENTER);  
-		canvas.drawText(Integer.toString(this.value), x + CELL_WIDTH / 2, baseline, paint);
+		canvas.drawText(Integer.toString(this.value), this.getX() + this.width / 2, baseline, paint);
 	}
 }
