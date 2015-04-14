@@ -22,6 +22,7 @@ public class Card extends View{
 	String color_value;
 	int textSize = 32;
 
+	@Override
 	public void onDraw(Canvas canvas) {
 		this.canvas = canvas;
 		this.setAtrribute();

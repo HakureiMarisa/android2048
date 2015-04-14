@@ -8,7 +8,7 @@ public class MainActivity extends Activity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		r.
 		setContentView(R.layout.main);
 		//mv = (MainView) findViewById(R.id.mainview);
 		//cv.addCard();

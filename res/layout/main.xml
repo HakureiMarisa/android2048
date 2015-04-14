@@ -55,7 +55,7 @@
         android:layout_centerInParent="true">      
     </com.jamieyang.a2048.MainView>
     
-    <Button android:id="@+id/button"
+    <Button android:id="@+id/button1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="移动"/>

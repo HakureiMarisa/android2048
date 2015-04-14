@@ -78,6 +78,7 @@ public class MainView extends RelativeLayout implements OnGestureListener{
 
 	}
 	
+	@Override
 	public void onDraw(Canvas canvas){
 		paint.setARGB(255, 206, 182, 154);
 		canvas.drawRoundRect(paddingLeft, paddingTop, paddingLeft + lineWidth * 5 + cardWidth * 4, paddingTop + lineWidth * 5 + cardHeight * 4, 5, 5, paint);
@@ -91,6 +92,7 @@ public class MainView extends RelativeLayout implements OnGestureListener{
 		}
 	}
 
+	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		gestureDetector.onTouchEvent(event);
 		return true;
