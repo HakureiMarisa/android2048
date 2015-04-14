@@ -8,8 +8,9 @@ public class MainActivity extends Activity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		r.
 		setContentView(R.layout.main);
-
+		
+		GameLayout gl = (GameLayout) findViewById(R.id.gamelayout);
+		gl.addCard();gl.addCard();
 	}
 }
