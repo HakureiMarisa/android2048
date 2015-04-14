@@ -3,15 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="top" >
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:height="100dp"
-        android:text="2048"
-        android:width="100dp" />
 	<GridLayout>
 	    <TextView
         android:id="@+id/textView2"
@@ -22,14 +13,13 @@
         android:text="分数"
         android:width="50dp" />
 	</GridLayout>
-    
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="设置" />
-
+	<TextView
+	    android:id="@+id/textView3"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="设置"
+	    android:translationX="15000dp" />
     
     <GridView android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -37,4 +27,14 @@
         android:numColumns="4"
         
         ></GridView>
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:height="100dp"
+        android:text="2048"
+        android:width="100dp" />
+
 </LinearLayout>

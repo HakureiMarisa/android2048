@@ -10,10 +10,6 @@ public class MainActivity extends Activity{
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.main);
-		//mv = (MainView) findViewById(R.id.mainview);
-		//cv.addCard();
-		//cv.addCard();
+
 	}
-	
-	
 }
