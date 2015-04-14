@@ -5,15 +5,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.FontMetricsInt;
+import android.graphics.RectF;
+import android.util.Log;
 import android.view.View;
 
 public class Card extends View{
-	public Card(Context context) {
-		super(context);
-	}
-
-	float width, height;
-
 	Paint paint = new Paint();
 	Canvas canvas;
 
@@ -21,7 +17,12 @@ public class Card extends View{
 	String color_bg;
 	String color_value;
 	int textSize = 32;
+	int row, col;
 
+	public Card(Context context) {
+		super(context);
+	}
+	
 	@Override
 	public void onDraw(Canvas canvas) {
 		this.canvas = canvas;
@@ -92,7 +93,8 @@ public class Card extends View{
 
 	private void drawBackground() {
 		paint.setColor(Color.parseColor(this.color_bg));
-		canvas.drawRoundRect(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 5, 5, paint);
+		Log.i("draw", getLeft() + "," + getTop() + "," + getRight() + "," + getBottom());
+		canvas.drawRoundRect(new RectF(0, 0, getWidth(), getHeight()), 5, 5, paint);
 	}
 
 	private void drawValue() {
@@ -100,9 +102,9 @@ public class Card extends View{
 		paint.setTextSize(this.textSize);
 		FontMetricsInt fontMetrics = paint.getFontMetricsInt();  
         // 转载请注明出处：http://blog.csdn.net/hursing  
-	    float baseline = this.getY() + (this.height - (fontMetrics.bottom - fontMetrics.top)) / 2 - fontMetrics.top;  
+	    float baseline = 0 + ((getBottom() - getTop()) - (fontMetrics.bottom - fontMetrics.top)) / 2 - fontMetrics.top;  
 	    // 下面这行是实现水平居中，drawText对应改为传入targetRect.centerX()  
 	    paint.setTextAlign(Paint.Align.CENTER);  
-		canvas.drawText(Integer.toString(this.value), this.getX() + this.width / 2, baseline, paint);
+		canvas.drawText(Integer.toString(this.value), (getRight() - getLeft()) / 2, baseline, paint);
 	}
 }

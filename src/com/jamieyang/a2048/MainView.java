@@ -7,16 +7,16 @@ import java.util.Random;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
-public class MainView extends RelativeLayout implements OnGestureListener{
+public class MainView extends LinearLayout implements OnGestureListener{
 	GestureDetector gestureDetector;	
 	Paint paint = new Paint();
 	float paddingLeft = 20;
@@ -48,24 +48,8 @@ public class MainView extends RelativeLayout implements OnGestureListener{
 		}
 	}
 
-	public MainView(Context context, AttributeSet attrs, int defStyle){
-		super(context, attrs, defStyle);  
-		System.out.println("zzz1");
-		this.setWillNotDraw(false);
-		
-		gestureDetector = new GestureDetector(context, this);
-		//初始化剩余格子信息
-		for(int i = 0; i < cards.length; i++){
-			for(int j = 0; j < cards[i].length; j++){
-				this.leftcards.add(new Location(i, j));
-			}
-		}
-
-	}
-	
 	public MainView(Context context, AttributeSet attrs){
-		super(context, attrs, 0);  
-		System.out.println("zzz2");
+		super(context, attrs, 0);
 		this.setWillNotDraw(false);
 		
 		gestureDetector = new GestureDetector(context, this);
@@ -75,19 +59,18 @@ public class MainView extends RelativeLayout implements OnGestureListener{
 				this.leftcards.add(new Location(i, j));
 			}
 		}
-
 	}
 	
 	@Override
 	public void onDraw(Canvas canvas){
 		paint.setARGB(255, 206, 182, 154);
-		canvas.drawRoundRect(paddingLeft, paddingTop, paddingLeft + lineWidth * 5 + cardWidth * 4, paddingTop + lineWidth * 5 + cardHeight * 4, 5, 5, paint);
+		canvas.drawRoundRect(new RectF(paddingLeft, paddingTop, paddingLeft + lineWidth * 5 + cardWidth * 4, paddingTop + lineWidth * 5 + cardHeight * 4), 5, 5, paint);
 		paint.setARGB(255, 205, 199, 187);
 		for(int i = 0; i < 4; i++){
 			for(int j = 0; j < 4; j++){
 				float x = paddingLeft + lineWidth + (cardWidth + lineWidth) * i;
 				float y = paddingTop + lineWidth + (cardHeight + lineWidth) * j;
-				canvas.drawRoundRect(x, y, x + cardWidth, y + cardHeight, 5, 5, paint);
+				canvas.drawRoundRect(new RectF(x, y, x + cardWidth, y + cardHeight), 5, 5, paint);
 			}
 		}
 	}
@@ -179,12 +162,26 @@ public class MainView extends RelativeLayout implements OnGestureListener{
 		Card card = new Card(getContext());
 		//card.setX((lineWidth + cardWidth) * l.row);
 		//card.setY((lineWidth + cardHeight) * l.col);
-		card.width = cardWidth;
-		card.height = cardHeight;
+		//card.width = cardWidth;
+		//card.height = cardHeight;
 		card.value = value;
 		this.cards[l.row][l.col] = card;
-		System.out.println(getChildCount());
+		LayoutParams lp = new LayoutParams(android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+		/*lp.leftMargin = (int) (paddingLeft + lineWidth + (lineWidth + cardWidth) * l.row);
+		lp.topMargin = (int) (paddingTop + lineWidth + (lineWidth + cardHeight) * l.col);
+		System.out.println(lp.leftMargin);
+		lp.leftMargin = 15;
+		lp.topMargin = 50;
+		//lp.alignWithParent = true;
+		*/
 		this.addView(card);
+		
+		Button b = new Button(getContext());
+		b.setText("zzzz");
+		LayoutParams lp1 = new LayoutParams(android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+		/*lp1.leftMargin = 150;
+		lp1.topMargin = 250;*/
+		this.addView(b);
 		leftcards.remove(location);
 	}
 	
