@@ -11,6 +11,7 @@ public class MainActivity extends Activity{
 		setContentView(R.layout.main);
 		
 		GameLayout gl = (GameLayout) findViewById(R.id.gamelayout);
-		gl.addCard();gl.addCard();
+		gl.addCard();
+		gl.addCard();
 	}
 }

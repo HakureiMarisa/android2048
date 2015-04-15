@@ -93,7 +93,6 @@ public class Card extends View{
 
 	private void drawBackground() {
 		paint.setColor(Color.parseColor(this.color_bg));
-		Log.i("draw", getLeft() + "," + getTop() + "," + getRight() + "," + getBottom());
 		canvas.drawRoundRect(new RectF(0, 0, getWidth(), getHeight()), 5, 5, paint);
 	}
 

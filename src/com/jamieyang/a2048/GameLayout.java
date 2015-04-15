@@ -16,6 +16,8 @@ import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.Button;
 import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
@@ -43,6 +45,7 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 	List<Location> leftcards = new ArrayList<Location>();
 	boolean hasMoved = false;
 	Paint p = new Paint();
+	ScaleAnimation sa = new ScaleAnimation(0.1f, 1.0f, 0.1f, 1.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
 
 	@Override
 	public void onDraw(Canvas canvas) {
@@ -63,6 +66,7 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 
 	public GameLayout(Context context, AttributeSet attrs) {
 		super(context, attrs, 0);
+		gestureDetector = new GestureDetector(context, this);
 		this.setWillNotDraw(false);
 		int mScreenWidth = context.getResources().getDisplayMetrics().widthPixels;
 		int mScreenHeight = context.getResources().getDisplayMetrics().heightPixels;
@@ -71,6 +75,8 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 		cardWidth = 6 * lineWidth;
 		cardHeight = cardWidth;
 		this.refrashLeftcards();
+		
+		sa.setDuration(200);
 	}
 
 	@Override
@@ -92,10 +98,10 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 		int childCount = getChildCount();
 		for (int i = 0; i < childCount; i++) {
 			Card childView = (Card) getChildAt(i);
-			left += childView.row * (cardWidth + lineWidth);
-			top += childView.col * (cardHeight + lineWidth);
-			childView.layout(left, top, left + (int) cardWidth, top
-					+ (int) cardHeight);
+			int childLeft = (int) (left + childView.row * (cardWidth + lineWidth));
+			int childTop = (int) (top + childView.col * (cardHeight + lineWidth));
+			System.out.println(childView.row + ", " + childView.col);
+			childView.layout(childLeft, childTop, childLeft + (int) cardWidth, childTop + (int) cardHeight);
 		}
 	}
 
@@ -149,13 +155,13 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 				this.invalidate();
 			}else if(offsettingX >= 50){
 				Toast.makeText(this.getContext(), "左滑", Toast.LENGTH_SHORT).show();
-				this.moveLeft();
+				//this.moveLeft();
 				this.invalidate();
 			}
 		}else{
 			if(offsettingY >= 50){
 				Toast.makeText(this.getContext(), "上滑", Toast.LENGTH_SHORT).show();
-				//this.moveUp();
+				this.moveUp();
 				this.invalidate();
 			}else if(offsettingY <= -50){
 				Toast.makeText(this.getContext(), "下滑", Toast.LENGTH_SHORT).show();
@@ -184,8 +190,8 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 						Card c1 = (Card) this.getChildAt(cards[row][col]);
 						if(c.value == c1.value){
 							c1.value *= 2;							
-							c.value = 0;
-							this.cards[row][col] = -1;
+							this.removeView(c);
+							this.cards[row][temp] = -1;
 							this.hasMoved = true;
 						}
 						break;
@@ -225,23 +231,29 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 			this.addCard();
 		}
 	}
-	
+	*/
 	public void moveUp(){
 		this.hasMoved = false;
-		for(int row = 0; row < COUNTX - 1; row++){
-			for(int col = 0; col < COUNTY; col++){
-				for(int temp = row + 1; temp < COUNTX ; temp++){
-					if(cards[temp][col].value != 0 && cards[row][col].value == 0){
-						int value = cards[temp][col].value;
-						cards[row][col].value = value;
-						cards[temp][col].value = 0;
-						this.hasMoved = true;
-					}else if(cards[temp][col].value != 0 && cards[row][col].value == cards[temp][col].value){
-						cards[row][col].value *= 2;
-						cards[temp][col].value = 0;
-						this.hasMoved = true;
-						break;
-					}else if(cards[temp][col].value != 0 && cards[row][col].value != 0){
+		for(int row = 0; row < COUNTX; row++){
+			for(int col = 0; col < COUNTY - 1; col++){
+				for(int temp = col + 1; temp < COUNTY; temp++){
+					if(cards[row][temp] >= 0){
+						Card c = (Card) this.getChildAt(cards[row][temp]);
+						if(cards[row][col] < 0){							
+							c.row = row;
+							c.col = col;						
+							this.cards[row][col] = cards[row][temp];
+							this.cards[row][temp] = -1;
+							this.hasMoved = true;
+							continue;
+						}
+						Card c1 = (Card) this.getChildAt(cards[row][col]);
+						if(c.value == c1.value){
+							c1.value *= 2;							
+							this.removeView(c);
+							this.cards[row][temp] = -1;
+							this.hasMoved = true;
+						}
 						break;
 					}
 				}				
@@ -252,7 +264,7 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 			this.addCard();
 		}
 	}
-	
+	/*
 	public void moveDown(){
 		System.out.println("movedown");
 		this.hasMoved = false;
@@ -283,15 +295,17 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 	*/
 	public void addCard(){		
 		int leftCount = leftcards.size();
-		int location = new Random().nextInt(leftCount);
-		Location l = leftcards.get(location);
+		int index = new Random().nextInt(leftCount);
+		Location l = leftcards.get(index);		
 		int value = Math.random() < 0.7 ? 2 : 4;
 		Card card = new Card(getContext());		
 		card.value = value;
 		card.row = l.row;
 		card.col = l.col;
 		this.addView(card);
-		leftcards.remove(location);
+		card.startAnimation(sa);		
+		this.cards[l.row][l.col] = indexOfChild(card);
+		leftcards.remove(index);
 	}
 	
 	public void refrashLeftcards(){
