@@ -1,67 +1,63 @@
-<?xml version="1.0" encoding="utf-8"?><RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/ll_best"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"
-        android:background="@drawable/scode"
-        android:orientation="vertical" >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:text="最高纪录：" />
-        <TextView
-            android:id="@+id/tv_bestScore"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:textColor="#FF0000"
-            android:text="0" />
-    </LinearLayout>
-    
-    <LinearLayout
-        android:id="@+id/ll_current"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/ll_best"
-        android:layout_marginRight="10dp"
-        android:background="@drawable/scode"
-        android:orientation="vertical" >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:text="当前分数：" />
-        <TextView
-            android:id="@+id/tv_currenScore"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:textColor="#FF0000"
-            android:text="0" />
-    </LinearLayout>
-	<!-- 
-    <com.jamieyang.a2048.MainView
-        android:id="@+id/mainview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-        <Button
-            android:layout_width="100px"
-            android:layout_height="150px"  />
-        <Button
-            android:layout_width="100px"
-            android:layout_height="150px"  />
-    </com.jamieyang.a2048.MainView>
-	-->
+        android:layout_height="wrap_content">
+	    <LinearLayout
+	        android:id="@+id/ll_best"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginRight="10dp"
+	        android:background="#fff00f"
+	        android:orientation="vertical" >
+	        <TextView
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:textSize="18sp"
+	            android:text="最高纪录：" />
+	        <TextView
+	            android:id="@+id/tv_bestScore"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:textSize="20sp"
+	            android:textColor="#FF0000"
+	            android:text="0" />
+	    </LinearLayout>
+	    
+	    <LinearLayout
+	        android:id="@+id/ll_current"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginRight="10dp"
+	        android:background="#fff00f"
+	        android:orientation="vertical" >
+	        <TextView
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:textSize="18sp"
+	            android:text="当前分数：" />
+	        <TextView
+	            android:id="@+id/tv_currenScore"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:textSize="20sp"
+	            android:textColor="#FF0000"
+	            android:text="0" />
+	    </LinearLayout>
+	    
+	    <Button 
+	        android:id="@+id/btn_restart"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:text="重新开始"/>
+	</LinearLayout>
     <com.jamieyang.a2048.GameLayout android:id="@+id/gamelayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">       
+        android:layout_height="wrap_content">       
     </com.jamieyang.a2048.GameLayout>
 
-</RelativeLayout>
+</LinearLayout>

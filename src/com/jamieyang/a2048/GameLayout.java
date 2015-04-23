@@ -9,9 +9,12 @@ import java.util.Random;
 import com.jamieyang.a2048.MainView.Location;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
@@ -25,6 +28,7 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.Transformation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 
@@ -48,6 +52,8 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 	ScaleAnimation sa = new ScaleAnimation(0f, 1.0f, 0f, 1.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
 	private Map<Card, Animation> animations = new HashMap<Card, Animation>();
 
+	public TextView currentScore, bestScore;
+		
 	@Override
 	public void onDraw(Canvas canvas) {
 		paint.setARGB(255, 206, 182, 154);
@@ -292,6 +298,7 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 			animations.put(cards[row][temp], as);
 			*/
 			this.removeView(cards[row1][col1]);
+			this.addScore(cards[row2][col2].value);
 			cards[row2][col2].value *= 2;
 			cards[row1][col1] = null;
 			this.hasMoved = true;
@@ -300,6 +307,27 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 			return true;
 		}
 		return false;
+	}
+	
+	public void addScore(int score){
+		int score1 = Integer.parseInt(this.currentScore.getText().toString()) + score;
+		if(getBestScore() < score1){
+			this.setBestScore(score1);
+			this.bestScore.setText(score1 + "");
+		}
+		this.currentScore.setText(score1 + "");
+	}
+	
+	private String best_score = "best_score";
+	
+	public int getBestScore(){
+		SharedPreferences pm = PreferenceManager.getDefaultSharedPreferences(getContext());
+		return pm.getInt(this.best_score, 0);
+	}
+	
+	public void setBestScore(int value){
+		SharedPreferences pm = PreferenceManager.getDefaultSharedPreferences(getContext());
+		pm.edit().putInt(this.best_score, value).commit();		
 	}
 	
 	public void addCard(){		
@@ -318,6 +346,20 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 		
 		this.cards[l.row][l.col] = card;
 		leftcards.remove(index);
+	}
+	
+	
+	public void start(){
+		this.bestScore.setText(this.getBestScore() + "");
+		this.addCard();
+		this.addCard();
+	}
+	
+	public void restart(){
+		this.removeAllViews();
+		this.cards = new Card[COUNTX][COUNTY];
+		this.currentScore.setText("0");
+		this.start();
 	}
 	
 	public void refrashLeftcards(){
