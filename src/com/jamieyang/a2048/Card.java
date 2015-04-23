@@ -14,8 +14,8 @@ public class Card extends View{
 	Canvas canvas;
 
 	int value = 0;
-	String color_bg;
-	String color_value;
+	int color_bg;
+	int color_value;
 	int textSize = 32;
 	int row, col;
 
@@ -35,6 +35,11 @@ public class Card extends View{
 		int[] data_num_color = { -10395295, -10395295, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 		int[] data_numbg_color = { -4133, -6214, -29591, -36266, -40121, -47872, -1123198, -1128192, -1135346, -1140224, -23217, -4985286, -4985286 };
 		
+		int index = 32 - Integer.numberOfLeadingZeros(this.value);
+		
+		color_bg = data_numbg_color[index - 1 ];
+		color_value = data_num_color[index - 1];
+		/*
 		switch (this.value) {
 		case 0:
 			color_bg = "#CCC0B3";
@@ -89,15 +94,17 @@ public class Card extends View{
 			color_value = "black";
 			break;
 		}
+		*/
 	}
 
 	private void drawBackground() {
-		paint.setColor(Color.parseColor(this.color_bg));
+		
+		paint.setColor(this.color_bg);
 		canvas.drawRoundRect(new RectF(0, 0, getWidth(), getHeight()), 5, 5, paint);
 	}
 
 	private void drawValue() {
-		paint.setColor(Color.parseColor(this.color_value));
+		paint.setColor(this.color_value);
 		paint.setTextSize(this.textSize);
 		FontMetricsInt fontMetrics = paint.getFontMetricsInt();  
         // 转载请注明出处：http://blog.csdn.net/hursing  

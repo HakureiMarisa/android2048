@@ -1,7 +1,9 @@
 package com.jamieyang.a2048;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import com.jamieyang.a2048.MainView.Location;
@@ -17,7 +19,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationSet;
 import android.view.animation.ScaleAnimation;
+import android.view.animation.Transformation;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
@@ -34,18 +40,13 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 	final static int COUNTX = 4;
 	final static int COUNTY = 4;
 	
-	//存储坐标与index的对应关系，负数表示当前位置无卡片
-	int[][] cards = {
-		{-1, -1, -1, -1},
-		{-1, -1, -1, -1},
-		{-1, -1, -1, -1},
-		{-1, -1, -1, -1}
-	};
+	Card[][] cards = new Card[COUNTX][COUNTY];
 	
 	List<Location> leftcards = new ArrayList<Location>();
 	boolean hasMoved = false;
 	Paint p = new Paint();
-	ScaleAnimation sa = new ScaleAnimation(0.1f, 1.0f, 0.1f, 1.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+	ScaleAnimation sa = new ScaleAnimation(0f, 1.0f, 0f, 1.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+	private Map<Card, Animation> animations = new HashMap<Card, Animation>();
 
 	@Override
 	public void onDraw(Canvas canvas) {
@@ -62,8 +63,15 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 						+ cardHeight), 5, 5, paint);
 			}
 		}
+		
+		System.out.println("---" + animations.size());
+		for(Map.Entry<Card, Animation> entry: animations.entrySet()){
+			entry.getKey().startAnimation(entry.getValue());
+			//entry.getKey().clearAnimation();
+		}
+		animations.clear();
 	}
-
+	
 	public GameLayout(Context context, AttributeSet attrs) {
 		super(context, attrs, 0);
 		gestureDetector = new GestureDetector(context, this);
@@ -151,22 +159,30 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 		if(Math.abs(offsettingX) > Math.abs(offsettingY)){
 			if(offsettingX <= -50){
 				Toast.makeText(this.getContext(), "右滑", Toast.LENGTH_SHORT).show();
-				//this.moveRight();
-				this.invalidate();
+				this.moveRight();
+				//this.invalidate();
 			}else if(offsettingX >= 50){
 				Toast.makeText(this.getContext(), "左滑", Toast.LENGTH_SHORT).show();
-				//this.moveLeft();
-				this.invalidate();
+				this.moveLeft();
+				//this.invalidate();
 			}
 		}else{
 			if(offsettingY >= 50){
 				Toast.makeText(this.getContext(), "上滑", Toast.LENGTH_SHORT).show();
 				this.moveUp();
-				this.invalidate();
+				//this.invalidate();
 			}else if(offsettingY <= -50){
 				Toast.makeText(this.getContext(), "下滑", Toast.LENGTH_SHORT).show();
-				//this.moveDown();
-				this.invalidate();
+				this.moveDown();
+				/*
+				TranslateAnimation ta = new TranslateAnimation(1, 0, 1, 0, 1, 150, 1, 200);
+				ta.setDuration(2000);
+
+				Card c = (Card) getChildAt(0);
+				c.startAnimation(ta);
+				
+				this.hasMoved = true;
+				//this.invalidate();*/
 			}
 		}
 		return true;
@@ -174,26 +190,10 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 	
 	public void moveLeft(){
 		this.hasMoved = false;
-		for(int row = 0; row < COUNTX; row++){
-			for(int col = 0; col < COUNTY - 1; col++){
-				for(int temp = col + 1; temp < COUNTY; temp++){
-					if(cards[row][temp] >= 0){
-						Card c = (Card) this.getChildAt(cards[row][temp]);
-						if(cards[row][col] < 0){							
-							c.row = row;
-							c.col = col;						
-							this.cards[row][col] = cards[row][temp];
-							this.cards[row][temp] = -1;
-							this.hasMoved = true;
-							continue;
-						}
-						Card c1 = (Card) this.getChildAt(cards[row][col]);
-						if(c.value == c1.value){
-							c1.value *= 2;							
-							this.removeView(c);
-							this.cards[row][temp] = -1;
-							this.hasMoved = true;
-						}
+		for(int col = 0; col < COUNTX; col++){
+			for(int row = 0; row < COUNTY - 1; row++){
+				for(int temp = row + 1; temp < COUNTX; temp++){
+					if(this._move(temp, col, row, col)){
 						break;
 					}
 				}				
@@ -204,23 +204,13 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 			this.addCard();
 		}
 	}
-	/*
+
 	public void moveRight(){
 		this.hasMoved = false;
-		for(int row = 0; row < COUNTX; row++){
-			for(int col = COUNTY - 1; col > 0; col--){
-				for(int temp = col - 1; temp >= 0 ; temp--){
-					if(cards[row][temp].value != 0 && cards[row][col].value == 0){
-						int value = cards[row][temp].value;
-						cards[row][col].value = value;
-						cards[row][temp].value = 0;
-						this.hasMoved = true;
-					}else if(cards[row][temp].value != 0 && cards[row][col].value == cards[row][temp].value){
-						cards[row][col].value *= 2;
-						cards[row][temp].value = 0;
-						this.hasMoved = true;
-						break;
-					}else if(cards[row][col].value != 0 && cards[row][temp].value != 0){
+		for(int col = 0; col < COUNTX; col++){
+			for(int row = COUNTY - 1; row > 0; row--){
+				for(int temp = row - 1; temp >= 0 ; temp--){
+					if(this._move(temp, col, row, col)){
 						break;
 					}
 				}				
@@ -231,29 +221,21 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 			this.addCard();
 		}
 	}
-	*/
+	
+	private float getRelateDistanceX(int row1, int row2){
+		return (row1 - row2) * (cardWidth + lineWidth);
+	}
+	
+	private float getRelateDistanceY(int col1, int col2){
+		return (col1 - col2) * (cardHeight + lineWidth);
+	}
+		
 	public void moveUp(){
 		this.hasMoved = false;
 		for(int row = 0; row < COUNTX; row++){
 			for(int col = 0; col < COUNTY - 1; col++){
 				for(int temp = col + 1; temp < COUNTY; temp++){
-					if(cards[row][temp] >= 0){
-						Card c = (Card) this.getChildAt(cards[row][temp]);
-						if(cards[row][col] < 0){							
-							c.row = row;
-							c.col = col;						
-							this.cards[row][col] = cards[row][temp];
-							this.cards[row][temp] = -1;
-							this.hasMoved = true;
-							continue;
-						}
-						Card c1 = (Card) this.getChildAt(cards[row][col]);
-						if(c.value == c1.value){
-							c1.value *= 2;							
-							this.removeView(c);
-							this.cards[row][temp] = -1;
-							this.hasMoved = true;
-						}
+					if(this._move(row, temp, row, col)){
 						break;
 					}
 				}				
@@ -264,24 +246,13 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 			this.addCard();
 		}
 	}
-	/*
+	
 	public void moveDown(){
-		System.out.println("movedown");
 		this.hasMoved = false;
-		for(int row = COUNTX - 1; row > 0; row--){
-			for(int col = 0; col < COUNTY; col++){
-				for(int temp = row - 1; temp >= 0 ; temp--){
-					if(cards[temp][col].value != 0 && cards[row][col].value == 0){
-						int value = cards[temp][col].value;
-						cards[row][col].value = value;
-						cards[temp][col].value = 0;
-						this.hasMoved = true;
-					}else if(cards[temp][col].value != 0 && cards[row][col].value == cards[temp][col].value){
-						cards[row][col].value *= 2;
-						cards[temp][col].value = 0;
-						this.hasMoved = true;
-						break;
-					}else if(cards[temp][col].value != 0 && cards[row][col].value != 0){
+		for(int row = 0; row < COUNTX; row++){
+			for(int col = COUNTY - 1; col > 0; col--){
+				for(int temp = col - 1; temp >= 0 ; temp--){
+					if(this._move(row, temp, row, col)){
 						break;
 					}
 				}				
@@ -292,7 +263,45 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 			this.addCard();
 		}
 	}
-	*/
+	
+	public boolean _move(int row1, int col1, int row2, int col2){
+		if(!this.isEmptyCard(row1, col1) && isEmptyCard(row2, col2)){
+			
+			TranslateAnimation ta = new TranslateAnimation(0, getRelateDistanceX(row2, row1), 0, getRelateDistanceY(col2, col1));
+			ta.setDuration(2000);
+			ta.setFillAfter(true);
+			
+			//animations.put(cards[row1][col1], ta);
+			cards[row2][col2] = cards[row1][col1];
+			cards[row2][col2].row = row2;
+			cards[row2][col2].col = col2;
+			cards[row1][col1] = null;
+			this.hasMoved = true;
+		}else if(!this.isEmptyCard(row1, col1) && cards[row1][col1].value == cards[row2][col2].value){
+			/*
+			AnimationSet as = new AnimationSet(true);
+			TranslateAnimation ta = new TranslateAnimation(0, 0, 0, getRelateDistanceY(col, temp));
+			ta.setDuration(2000);
+			as.addAnimation(ta);
+			
+			ScaleAnimation sa = new ScaleAnimation(1.5f, 1.0f, 1.5f, 1.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+			sa.setDuration(2000);
+			sa.setStartOffset(3000);
+			//as.addAnimation(sa);
+			as.setFillAfter(true);
+			animations.put(cards[row][temp], as);
+			*/
+			this.removeView(cards[row1][col1]);
+			cards[row2][col2].value *= 2;
+			cards[row1][col1] = null;
+			this.hasMoved = true;
+			return true;
+		}else if(!this.isEmptyCard(row1, col1) && !this.isEmptyCard(row1, col2)){
+			return true;
+		}
+		return false;
+	}
+	
 	public void addCard(){		
 		int leftCount = leftcards.size();
 		int index = new Random().nextInt(leftCount);
@@ -303,8 +312,11 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 		card.row = l.row;
 		card.col = l.col;
 		this.addView(card);
-		card.startAnimation(sa);		
-		this.cards[l.row][l.col] = indexOfChild(card);
+
+		sa.setStartOffset(200);
+		this.animations.put(card, sa);
+		
+		this.cards[l.row][l.col] = card;
 		leftcards.remove(index);
 	}
 	
@@ -312,11 +324,18 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 		this.leftcards.clear();
 		for(int i = 0; i < cards.length; i++){
 			for(int j = 0; j < cards[i].length; j++){
-				if(cards[i][j] < 0){
+				if(this.isEmptyCard(i, j)){
 					this.leftcards.add(new Location(i, j));
 				}				
 			}
 		}
+	}
+	
+	private boolean isEmptyCard(int row, int col){
+		if(cards[row][col] == null || cards[row][col].value == 0){
+			return true;
+		}
+		return false;
 	}
 	
 	/*
@@ -329,5 +348,51 @@ public class GameLayout extends ViewGroup implements OnGestureListener{
 			this.row = row;
 			this.col = col;
 		}
+	}
+	
+	class CardAnimationManager{
+		private float mFromXDelta;
+	    private float mToXDelta;
+	    private float mFromYDelta;
+	    private float mToYDelta;
+	    
+	    private List<Animation> animations = new ArrayList<Animation>();
+	    
+		public CardAnimationManager() {
+
+		}
+
+		public void addAnimation(float fromRow, float toRow, float fromCol, float toCol, float index, float space){
+			
+		}	
+	}
+	
+	class CardAnimationListener implements Animation.AnimationListener{
+		GameLayout gl;
+		Card card;
+		
+		CardAnimationListener(GameLayout gl, Card card){
+			this.gl = gl;
+			this.card = card;
+		}
+		
+		@Override
+		public void onAnimationStart(Animation animation) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onAnimationEnd(Animation animation) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onAnimationRepeat(Animation animation) {
+			Card c = (Card) gl.getChildAt(gl.indexOfChild(card));
+			//animation.
+		}
+		
 	}
 }
